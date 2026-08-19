@@ -1,53 +1,44 @@
 /* =====================================================
+   THREADSCOPE - RESPONSIVE JAVASCRIPT
+===================================================== */
+
+
+/* =====================================================
    MOBILE MENU
 ===================================================== */
 
-const menuButton =
-    document.querySelector(".menu-button");
+const menuButton = document.querySelector(".menu-button");
+const navLinks = document.querySelector(".nav-links");
+const navActions = document.querySelector(".nav-actions");
 
-const navLinks =
-    document.querySelector(".nav-links");
+if (menuButton && navLinks && navActions) {
 
-const navActions =
-    document.querySelector(".nav-actions");
+    menuButton.addEventListener("click", () => {
 
+        const menuIsOpen =
+            navLinks.classList.contains("mobile-open");
 
-menuButton.addEventListener("click", () => {
+        if (menuIsOpen) {
 
-    const menuIsOpen =
-        navLinks.classList.contains("mobile-open");
+            navLinks.classList.remove("mobile-open");
+            navActions.classList.remove("mobile-open");
 
+            menuButton.textContent = "☰";
+            menuButton.setAttribute("aria-expanded", "false");
 
-    if (menuIsOpen) {
+        } else {
 
-        navLinks.classList.remove(
-            "mobile-open"
-        );
+            navLinks.classList.add("mobile-open");
+            navActions.classList.add("mobile-open");
 
-        navActions.classList.remove(
-            "mobile-open"
-        );
+            menuButton.textContent = "×";
+            menuButton.setAttribute("aria-expanded", "true");
 
-        menuButton.textContent = "☰";
+        }
 
-    }
+    });
 
-    else {
-
-        navLinks.classList.add(
-            "mobile-open"
-        );
-
-        navActions.classList.add(
-            "mobile-open"
-        );
-
-        menuButton.textContent = "×";
-
-    }
-
-});
-
+}
 
 
 /* =====================================================
@@ -55,39 +46,32 @@ menuButton.addEventListener("click", () => {
 ===================================================== */
 
 const generateButton =
-    document.getElementById(
-        "generateButton"
-    );
-
+    document.getElementById("generateButton");
 
 const workspace =
-    document.querySelector(
-        ".workspace"
-    );
+    document.querySelector(".workspace");
 
 
-generateButton.addEventListener(
-    "click",
-    () => {
+if (generateButton) {
 
-        generateButton.innerHTML =
-            "Generating...";
+    generateButton.addEventListener("click", () => {
 
+        generateButton.innerHTML = "Generating...";
+        generateButton.disabled = true;
 
-        generateButton.disabled =
-            true;
+        if (workspace) {
+            workspace.classList.add("generating");
+        }
 
 
         setTimeout(() => {
 
-            workspace.classList.add(
-                "generated"
-            );
-
+            if (workspace) {
+                workspace.classList.add("generated");
+            }
 
             generateButton.innerHTML =
                 "Direction generated ✓";
-
 
         }, 700);
 
@@ -97,15 +81,17 @@ generateButton.addEventListener(
             generateButton.innerHTML =
                 'Generate direction <span>→</span>';
 
+            generateButton.disabled = false;
 
-            generateButton.disabled =
-                false;
+            if (workspace) {
+                workspace.classList.remove("generating");
+            }
 
         }, 2500);
 
-    }
-);
+    });
 
+}
 
 
 /* =====================================================
@@ -118,43 +104,52 @@ const revealElements =
     );
 
 
-const revealObserver =
-    new IntersectionObserver(
-        (entries) => {
+if ("IntersectionObserver" in window) {
 
-            entries.forEach(
-                (entry) => {
+    const revealObserver =
+        new IntersectionObserver(
+            (entries) => {
 
-                    if (
-                        entry.isIntersecting
-                    ) {
+                entries.forEach((entry) => {
+
+                    if (entry.isIntersecting) {
 
                         entry.target.classList.add(
                             "revealed"
                         );
 
+                        revealObserver.unobserve(
+                            entry.target
+                        );
+
                     }
 
-                }
-            );
+                });
 
-        },
-        {
-            threshold: 0.15
-        }
-    );
-
-
-revealElements.forEach(
-    (element) => {
-
-        revealObserver.observe(
-            element
+            },
+            {
+                threshold: 0.15
+            }
         );
 
-    }
-);
 
+    revealElements.forEach((element) => {
+
+        revealObserver.observe(element);
+
+    });
+
+} else {
+
+    /* Older browser fallback */
+
+    revealElements.forEach((element) => {
+
+        element.classList.add("revealed");
+
+    });
+
+}
 
 
 /* =====================================================
@@ -171,56 +166,40 @@ revealElements.forEach(
 
 let secretCode = "";
 
+document.addEventListener("keydown", (event) => {
 
-document.addEventListener(
-    "keydown",
-    (event) => {
+    secretCode += event.key.toLowerCase();
 
-        secretCode +=
-            event.key.toLowerCase();
+    /* Keep only the last 20 characters */
+    if (secretCode.length > 20) {
+
+        secretCode =
+            secretCode.slice(-20);
+
+    }
 
 
-        if (
-            secretCode.endsWith(
-                "thread"
-            )
-        ) {
+    if (secretCode.endsWith("thread")) {
 
-            document.body.classList.add(
+        document.body.classList.add(
+            "secret-mode"
+        );
+
+
+        setTimeout(() => {
+
+            document.body.classList.remove(
                 "secret-mode"
             );
 
-
-            setTimeout(() => {
-
-                document.body.classList.remove(
-                    "secret-mode"
-                );
-
-            }, 2500);
+        }, 2500);
 
 
-            secretCode = "";
-
-        }
-
-
-        /*
-            Keep the string small.
-        */
-
-        if (
-            secretCode.length > 20
-        ) {
-
-            secretCode =
-                secretCode.slice(-10);
-
-        }
+        secretCode = "";
 
     }
-);
 
+});
 
 
 /* =====================================================
@@ -233,29 +212,72 @@ const mobileLinks =
     );
 
 
-mobileLinks.forEach(
-    (link) => {
+mobileLinks.forEach((link) => {
 
-        link.addEventListener(
-            "click",
-            () => {
+    link.addEventListener("click", () => {
 
-                navLinks.classList.remove(
-                    "mobile-open"
-                );
+        if (navLinks) {
 
-                navActions.classList.remove(
-                    "mobile-open"
-                );
+            navLinks.classList.remove(
+                "mobile-open"
+            );
 
-                menuButton.textContent =
-                    "☰";
+        }
 
-            }
-        );
+        if (navActions) {
+
+            navActions.classList.remove(
+                "mobile-open"
+            );
+
+        }
+
+        if (menuButton) {
+
+            menuButton.textContent = "☰";
+
+            menuButton.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+
+        }
+
+    });
+
+});
+
+
+/* =====================================================
+   CLOSE MOBILE MENU WHEN WINDOW BECOMES DESKTOP
+===================================================== */
+
+window.addEventListener("resize", () => {
+
+    if (window.innerWidth > 768) {
+
+        if (navLinks) {
+            navLinks.classList.remove("mobile-open");
+        }
+
+        if (navActions) {
+            navActions.classList.remove("mobile-open");
+        }
+
+        if (menuButton) {
+
+            menuButton.textContent = "☰";
+
+            menuButton.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+
+        }
 
     }
-);
+
+});
 const generateBtn = document.getElementById("generateBtn");
 
 if (generateBtn) {
