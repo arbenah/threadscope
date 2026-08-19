@@ -274,3 +274,18 @@ if (generateBtn) {
         }, 1200);
     });
 }
+let secretCode = "";
+
+document.addEventListener("keydown", function (event) {
+    secretCode += event.key.toUpperCase();
+
+    if (secretCode.length > 6) {
+        secretCode = secretCode.slice(-6);
+    }
+
+    if (secretCode === "THREAD") {
+        alert("🧵 You found the ThreadScope secret.");
+
+        secretCode = "";
+    }
+});
